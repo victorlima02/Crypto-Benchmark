@@ -62,7 +62,7 @@ public class AsymmetricCipherTester extends TimeTester{
      * <p>
      * To encrypt large amounts of data, the ciphers where used as ECB, manually
      * created. And for diversity, RSA was used with varying padding schemes
-     * applied on each iteration of the ECB mode along with 240 byte buffers.
+     * applied on each iteration of the ECB mode along with 126 byte buffers.
      * </p>
      *
      * @since 1.0
@@ -86,16 +86,16 @@ public class AsymmetricCipherTester extends TimeTester{
 
             //RSA - PKCS1Padding
             providers = new String[]{"BC", "FlexiCore", "SunJCE"};
-            asymTester.execTests(nTests, file, out, "RSA/NONE/PKCS1Padding", 2048, providers);
+            asymTester.execTests(nTests, file, out, "RSA/ECB/PKCS1Padding", 2048, providers);
             //RSA - OAEPWithSHA1AndMGF1Padding
-            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
-            asymTester.execTests(nTests, file, out, "RSA/NONE/OAEPWithSHA1AndMGF1Padding", 2048, providers);
+            providers = new String[]{ "BC", "FlexiCore","SunJCE"};
+            asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA1AndMGF1Padding", 2048, providers);
             //RSA - OAEPWithSHA-224AndMGF1Padding
             providers = new String[]{"BC", "FlexiCore", "SunJCE"};
-            asymTester.execTests(nTests, file, out, "RSA/NONE/OAEPWithSHA-224AndMGF1Padding", 2048, providers);
+            asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA-224AndMGF1Padding", 2048, providers);
             //RSA - OAEPWithSHA512AndMGF1Padding
-            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
-            asymTester.execTests(nTests, file, out, "RSA/NONE/OAEPWithSHA512AndMGF1Padding", 2048, providers);
+            providers = new String[]{ "BC", "FlexiCore","SunJCE"};
+            asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA-512AndMGF1Padding", 2048, providers);
             //ECIES
             providers = new String[]{"BC", "FlexiEC"};
             asymTester.execTests(nTests, file, out, "ECIES", 256, providers);
@@ -167,7 +167,7 @@ public class AsymmetricCipherTester extends TimeTester{
         cipherDecription = Cipher.getInstance(algorithm, provider);
         cipherDecription.init(Cipher.DECRYPT_MODE, privKey);
 
-        byte inputBuffer[] = new byte[240];
+        byte inputBuffer[] = new byte[126];
 
         byte[] bufferTmp;
         int lenght;
