@@ -1,0 +1,104 @@
+ * This code was written for an assignment for concept demonstration purposes:
+ *  caution required
+ *
+ * The MIT License
+ *
+ * Copyright 2014 Victor de Lima Soares.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+
+This is a project written to compare three encryption libraries concerning time 
+performance when encrypting and decrypting files.
+The code was written and tested with a Java SE 8 JDK (Nov-2014) and should 
+present different results when running in different platforms. 
+Libraries can be easy included and removed, as the testing code was written 
+considering JCA cryptographic architecture; however, minor changes should be 
+made if libraries do not use standard names or do not support the same 
+algorithms – considering padding and mode of operation as algorithm 
+differentiation.
+
+As it is, the code is testing:
+Libraries:
+	FlexiProvider from Technische Universität Darmstadt, Germany
+	Sun providers from Oracle
+	The Bouncy Castle provider from The Legion of the Bouncy Castle
+As they have being actively maintained with a large variety of ciphers.
+
+It measures:
+    Clock time: time elapsed between the start and end of measurements.
+    User time: is the time spent running application's own code.
+    System time: is the time spent running OS code on behalf of the 
+                application; e.g., I/O.
+    CPU time: is user time plus system time. It is the total time spent using 
+                any CPU for the application.
+
+All Tester classes can be use parameters to include define the input file for 
+testing, the key length, the output destination, and number of tests to 
+execute – and average is provided in the following format 
+(flexible-by using the performance library):
+
+Algorithm (possibly mode and padding)-Provider
+N. Experiments	Clock Time	  Cpu Time	 User Time	System Time     Unity
+             x	         x	         x	         x	          x
+
+For example:
+MD5-BC
+ N. Experiments	Clock Time	  Cpu Time	 User Time	System Time	MILLISECONDS/experiment
+             10	    120.40	    120.30	    112.50	       7.80
+
+
+
+--------------------------------------------------------------------------------
+Dependences
+ 
+JRE/JDK/Java 8 jurisdiction files ----------------------------------------------
+The JRE/JDK/Java 8 jurisdiction files can be found here:
+
+Java Cryptography Extension (JCE) 
+Unlimited Strength Jurisdiction Policy Files 8 Download
+http://www.oracle.com/technetwork/java/javase/downloads/jce8-download-2133166.html
+
+Install the files in ${java.home}/jre/lib/security/
+
+Those files need to be installed on both jdk and jre if the jre used on the 
+system is not the same as the one shipped with the jdk.
+
+If using an IDE, restart the IDE.
+
+Flexiprovider ------------------------------------------------------------------
+
+Requires:
+    FlexiCoreProvider package
+    FlexiECProvider package 
+    SourceForge ASN.1 CoDec (patch for PKCS#12) 
+
+All libraries for the Flexiprovider can be found at:
+http://www.flexiprovider.de/download.html
+
+The should be on the CLASSPATH. If possible, on ${java.home}/jre/lib/ext
+
+The Bouncy Castle Crypto package -----------------------------------------------
+
+Requires:
+    bcprov-jdk15on-151
+
+All libraries can be found at:
+https://www.bouncycastle.org/latest_releases.html
+
+The should be on the CLASSPATH. If possible, on ${java.home}/jre/lib/ext
