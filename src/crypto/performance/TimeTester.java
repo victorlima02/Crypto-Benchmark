@@ -80,6 +80,7 @@ public abstract class TimeTester {
      * the collected data in a summary.
      * </p>
      *
+     * 
      * @since 1.0
      * @param nTests Number of tests to run.
      * @param baseInput Input file to run the tests.
@@ -87,6 +88,12 @@ public abstract class TimeTester {
      * @param algorithm Algorithm to be used.
      * @param keySize Key size.
      * @param providers Libraries from where the algorithms comes.
+     * 
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
      */
     public void execTests(int nTests, File baseInput, PrintStream out, String algorithm, int keySize, String[] providers)
             throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
@@ -115,6 +122,12 @@ public abstract class TimeTester {
      * @param algorithm Algorithm to be used.
      * @param provider Library from where the algorithm comes.
      * @return A Summary containing the time measurements.
+     * 
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
      */
     public TimerSummary execTests(int nTests, File baseInput, String algorithm, String provider)
             throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
@@ -144,6 +157,12 @@ public abstract class TimeTester {
      * @param keySize Key size.
      * @param provider Library from where the algorithm comes.
      * @return A Summary containing the time measurements.
+     * 
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
      */
     public TimerSummary execTests(int nTests, File baseInput, String algorithm, int keySize, String provider)
             throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
@@ -166,6 +185,12 @@ public abstract class TimeTester {
      * @param algorithm Algorithm to be used.
      * @param provider Library from where the algorithm comes.
      * @return A SimpleMeter containing the time measurements.
+     * 
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
      */
     public abstract SimpleMeter test(File baseInput, String algorithm, String provider)
             throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
@@ -185,6 +210,12 @@ public abstract class TimeTester {
      * @param provider Library from where the algorithm comes.
      *
      * @return A SimpleMeter containing the time measurements.
+     * 
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
      */
     public SimpleMeter test(File baseInput, String algorithm, int keySize, String provider)
             throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
