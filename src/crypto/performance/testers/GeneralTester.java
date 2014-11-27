@@ -59,9 +59,21 @@ import performance.TimerSummary;
 public class GeneralTester {
 
     public static void main(String[] args) {
+        //Encryption and decription performance test.
         BlockCipherTester.run();
         HashTester.run();
         AsymmetricCipherTester.run();
         StreamCipherTester.run();
+
+        //Encryption only performance test.
+        BlockCipherTester.run(true);
+        AsymmetricCipherTester.run(true);
+        StreamCipherTester.run(true);
+
+        //Decription only performance test.
+        BlockCipherTester.run(false);
+        AsymmetricCipherTester.run(false);
+        StreamCipherTester.run(false);
     }
+
 }

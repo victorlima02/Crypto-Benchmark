@@ -80,7 +80,41 @@ public abstract class TimeTester {
      * the collected data in a summary.
      * </p>
      *
-     * 
+     * @since 1.0
+     * @param nTests Number of tests to run.
+     * @param baseInput Input file to run the tests.
+     * @param out Results destination.
+     * @param algorithm Algorithm to be used.
+     * @param encryptDecrypt If the tests are to be for encryption or
+     * decryption.
+     * <ul>
+     * <li>true: if the test is for encryption;</li>
+     * <li>false: otherwise.</li>
+     * </ul>
+     * @param providers Libraries from where the algorithms comes.
+     */
+    public void execTests(int nTests, File baseInput, PrintStream out, String algorithm, boolean encryptDecrypt, String[] providers)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException {
+
+        TimerSummary testsSummary;
+
+        for (String provider : providers) {
+            testsSummary = execTests(nTests, baseInput, algorithm, encryptDecrypt, provider);
+            testsSummary.print(out);
+            out.println();
+        }
+    }
+
+    /**
+     * Executes n tests on the specified algorithm from the given provider.
+     *
+     * <p>
+     * Executes n sequential tests, collecting time measurements and returning
+     * the collected data in a summary.
+     * </p>
+     *
+     *
      * @since 1.0
      * @param nTests Number of tests to run.
      * @param baseInput Input file to run the tests.
@@ -88,7 +122,7 @@ public abstract class TimeTester {
      * @param algorithm Algorithm to be used.
      * @param keySize Key size.
      * @param providers Libraries from where the algorithms comes.
-     * 
+     *
      * @throws java.security.NoSuchProviderException
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException
@@ -116,13 +150,55 @@ public abstract class TimeTester {
      * the collected data in a summary.
      * </p>
      *
+     *
+     * @since 1.0
+     * @param nTests Number of tests to run.
+     * @param baseInput Input file to run the tests.
+     * @param out Results destination.
+     * @param algorithm Algorithm to be used.
+     * @param encryptDecrypt If the tests are to be for encryption or
+     * decryption.
+     * <ul>
+     * <li>true: if the test is for encryption;</li>
+     * <li>false: otherwise.</li>
+     * </ul>
+     * @param keySize Key size.
+     * @param providers Libraries from where the algorithms comes.
+     *
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
+     */
+    public void execTests(int nTests, File baseInput, PrintStream out, String algorithm, boolean encryptDecrypt, int keySize, String[] providers)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException {
+
+        TimerSummary testsSummary;
+
+        for (String provider : providers) {
+            testsSummary = execTests(nTests, baseInput, algorithm, encryptDecrypt, keySize, provider);
+            testsSummary.print(out);
+            out.println();
+        }
+    }
+
+    /**
+     * Executes n tests on the specified algorithm from the given provider.
+     *
+     * <p>
+     * Executes n sequential tests, collecting time measurements and returning
+     * the collected data in a summary.
+     * </p>
+     *
      * @since 1.0
      * @param nTests Number of tests to run.
      * @param baseInput Input file to run the tests.
      * @param algorithm Algorithm to be used.
      * @param provider Library from where the algorithm comes.
      * @return A Summary containing the time measurements.
-     * 
+     *
      * @throws java.security.NoSuchProviderException
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException
@@ -149,6 +225,56 @@ public abstract class TimeTester {
      * Executes n sequential tests, collecting time measurements and returning
      * the collected data in a summary.
      * </p>
+     * <p>
+     * This method will test encryption <b>or</b> decryption only.
+     * </p>
+     *
+     * @since 1.0
+     * @param nTests Number of tests to run.
+     * @param baseInput Input file to run the tests.
+     * @param algorithm Algorithm to be used.
+     * @param encryptDecrypt If the tests are to be for encryption or
+     * decryption.
+     * <ul>
+     * <li>true: if the test is for encryption;</li>
+     * <li>false: otherwise.</li>
+     * </ul>
+     * @param provider Library from where the algorithm comes.
+     * @return A Summary containing the time measurements.
+     *
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
+     */
+    public TimerSummary execTests(int nTests, File baseInput, String algorithm, boolean encryptDecrypt, String provider)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException {
+
+        TimerSummary summary = new TimerSummary(algorithm + "-" + provider);
+
+        for (int i = 0; i < nTests; i++) {
+            if (encryptDecrypt) {
+                summary.addSimpleMeter(testEncryption(baseInput, algorithm,  provider));
+            } else {
+                summary.addSimpleMeter(testDecryption(baseInput, algorithm, provider));
+            }
+        }
+
+        return summary;
+    }
+
+    /**
+     * Executes n tests on the specified algorithm from the given provider.
+     *
+     * <p>
+     * Executes n sequential tests, collecting time measurements and returning
+     * the collected data in a summary.
+     * </p>
+     * <p>
+     * This method will test encryption and decryption schemes.
+     * </p>
      *
      * @since 1.0
      * @param nTests Number of tests to run.
@@ -157,7 +283,7 @@ public abstract class TimeTester {
      * @param keySize Key size.
      * @param provider Library from where the algorithm comes.
      * @return A Summary containing the time measurements.
-     * 
+     *
      * @throws java.security.NoSuchProviderException
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException
@@ -178,14 +304,68 @@ public abstract class TimeTester {
     }
 
     /**
+     * Executes n tests on the specified algorithm from the given provider.
+     *
+     * <p>
+     * Executes n sequential tests, collecting time measurements and returning
+     * the collected data in a summary.
+     * </p>
+     *
+     * <p>
+     * This method will test encryption or decryption only.
+     * </p>
+     *
+     * @since 1.0
+     * @param nTests Number of tests to run.
+     * @param baseInput Input file to run the tests.
+     * @param algorithm Algorithm to be used.
+     * @param keySize Key size.
+     * @param provider Library from where the algorithm comes.
+     * @param encryptDecrypt If the tests are to be for encryption or
+     * decryption.
+     * <ul>
+     * <li>true: if the test is for encryption;</li>
+     * <li>false: otherwise.</li>
+     * </ul>
+     * @return A Summary containing the time measurements.
+     *
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
+     */
+    public TimerSummary execTests(int nTests, File baseInput, String algorithm, boolean encryptDecrypt, int keySize, String provider)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException {
+
+        TimerSummary summary = new TimerSummary(algorithm + "-" + provider);
+
+        for (int i = 0; i < nTests; i++) {
+            if (encryptDecrypt) {
+                summary.addSimpleMeter(testEncryption(baseInput, algorithm, keySize, provider));
+            } else {
+                summary.addSimpleMeter(testDecryption(baseInput, algorithm, keySize, provider));
+            }
+        }
+
+        return summary;
+    }
+
+    /**
      * Test the specified scheme.
+     *
+     * <p>
+     * Execute an encryption and a decryption algorithm, returning the total
+     * time performance measurements.
+     * </p>
      *
      * @since 1.0
      * @param baseInput Input file to run the tests.
      * @param algorithm Algorithm to be used.
      * @param provider Library from where the algorithm comes.
      * @return A SimpleMeter containing the time measurements.
-     * 
+     *
      * @throws java.security.NoSuchProviderException
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException
@@ -200,7 +380,12 @@ public abstract class TimeTester {
      * Test the specified scheme.
      *
      * <p>
-     * By default, default key sizes are used.
+     * By default, default key sizes are used if this method is not overwritten.
+     * </p>
+     *
+     * <p>
+     * Execute an encryption and a decryption algorithm, returning the total
+     * time performance measurements.
      * </p>
      *
      * @since 1.0
@@ -210,7 +395,7 @@ public abstract class TimeTester {
      * @param provider Library from where the algorithm comes.
      *
      * @return A SimpleMeter containing the time measurements.
-     * 
+     *
      * @throws java.security.NoSuchProviderException
      * @throws java.security.NoSuchAlgorithmException
      * @throws javax.crypto.NoSuchPaddingException
@@ -221,6 +406,124 @@ public abstract class TimeTester {
             throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
             InvalidKeyException, InvalidAlgorithmParameterException {
         return test(baseInput, algorithm, provider);
+    }
+
+    /**
+     * Test the specified scheme, encryption only.
+     *
+     *
+     * <p>
+     * Execute an encryption algorithm, returning the total time performance
+     * measurements.
+     * </p>
+     *
+     * @since 1.0
+     * @param baseInput Input file to run the tests.
+     * @param algorithm Algorithm to be used.
+     * @param provider Library from where the algorithm comes.
+     *
+     * @return A SimpleMeter containing the time measurements.
+     *
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
+     */
+    public abstract SimpleMeter testEncryption(File baseInput, String algorithm, String provider)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException;
+
+    /**
+     * Test the specified scheme, encryption only.
+     *
+     *
+     * <p>
+     * Execute an encryption algorithm, returning the total time performance
+     * measurements.
+     * </p>
+     *
+     * <p>
+     * By default, default key sizes are used if this method is not overwritten.
+     * </p>
+     *
+     * @since 1.0
+     * @param baseInput Input file to run the tests.
+     * @param algorithm Algorithm to be used.
+     * @param keySize Key size.
+     * @param provider Library from where the algorithm comes.
+     *
+     * @return A SimpleMeter containing the time measurements.
+     *
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
+     */
+    public SimpleMeter testEncryption(File baseInput, String algorithm, int keySize, String provider)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException {
+        return testEncryption(baseInput, algorithm, provider);
+    }
+
+    /**
+     * Test the specified scheme, decryption only.
+     *
+     *
+     * <p>
+     * Execute an decryption algorithm, returning the total time performance
+     * measurements.
+     * </p>
+     *
+     * @since 1.0
+     * @param baseInput Input file to run the tests.
+     * @param algorithm Algorithm to be used.
+     * @param provider Library from where the algorithm comes.
+     *
+     * @return A SimpleMeter containing the time measurements.
+     *
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
+     */
+    public abstract SimpleMeter testDecryption(File baseInput, String algorithm, String provider)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException;
+
+    /**
+     * Test the specified scheme, decryption only.
+     *
+     *
+     * <p>
+     * Execute an decryption algorithm, returning the total time performance
+     * measurements.
+     * </p>
+     *
+     * <p>
+     * By default, default key sizes are used if this method is not overwritten.
+     * </p>
+     *
+     * @since 1.0
+     * @param baseInput Input file to run the tests.
+     * @param algorithm Algorithm to be used.
+     * @param keySize Key size.
+     * @param provider Library from where the algorithm comes.
+     *
+     * @return A SimpleMeter containing the time measurements.
+     *
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
+     */
+    public SimpleMeter testDecryption(File baseInput, String algorithm, int keySize, String provider)
+            throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException,
+            InvalidKeyException, InvalidAlgorithmParameterException {
+        return testDecryption(baseInput, algorithm, provider);
     }
 
 }

@@ -24,8 +24,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-
 package crypto.performance.testers;
 
 import crypto.performance.Libraries;
@@ -58,11 +56,11 @@ import performance.SimpleMeter;
 public class StreamCipherTester extends TimeTester {
 
     /**
-     * Executes the default test: 
-     * 
+     * Executes the default test:
+     *
      * <p>
-     * Stream ciphers derived from block ciphers:
-     * DESede, AES and RC2 operating on CFB.
+     * Stream ciphers derived from block ciphers: DESede, AES and RC2 operating
+     * on CFB.
      * </p>
      *
      * @since 1.0
@@ -78,7 +76,7 @@ public class StreamCipherTester extends TimeTester {
         TimeTester blockTester = new BlockCipherTester();
 
         //Libraries
-        String[] providers = new String[]{"BC","FlexiCore", "SunJCE"};
+        String[] providers = new String[]{"BC", "FlexiCore", "SunJCE"};
 
         System.out.println("Evaluating stream ciphers...");
 
@@ -90,6 +88,53 @@ public class StreamCipherTester extends TimeTester {
             blockTester.execTests(nTests, file, out, "AES/CFB/PKCS5Padding", providers);
             //RC2 CFB
             blockTester.execTests(nTests, file, out, "RC2/CFB/PKCS5Padding", providers);
+
+        } catch (FileNotFoundException | NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
+            Logger.getLogger(HashTester.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.out.println("Done.");
+    }
+
+    /**
+     * Executes the default test:
+     *
+     * <p>
+     * Stream ciphers derived from block ciphers: DESede, AES and RC2 operating
+     * on CFB.
+     * </p>
+     *
+     * @since 1.0
+     */
+    public static void run(boolean encryptDecrypt) {
+
+        Libraries.registerProviders();
+
+        File file = new File("data/colors.jpg");
+        File results;
+        int nTests = 10;
+
+        TimeTester blockTester = new BlockCipherTester();
+
+        //Libraries
+        String[] providers = new String[]{"BC", "FlexiCore", "SunJCE"};
+
+        if (encryptDecrypt) {
+            results = new File("data/results/stream ciphers encryption.txt");
+            System.out.println("Evaluating stream ciphers (encryption)...");
+        } else {
+            results = new File("data/results/stream ciphers decryption.txt");
+            System.out.println("Evaluating stream ciphers (decryption)...");
+        }
+
+        try (PrintStream out = new PrintStream(results)) {
+
+            //3DES CFB
+            blockTester.execTests(nTests, file, out, "DESede/CFB/PKCS5Padding", encryptDecrypt, providers);
+            //AES CFB
+            blockTester.execTests(nTests, file, out, "AES/CFB/PKCS5Padding", encryptDecrypt, providers);
+            //RC2 CFB
+            blockTester.execTests(nTests, file, out, "RC2/CFB/PKCS5Padding", encryptDecrypt, providers);
 
         } catch (FileNotFoundException | NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
             Logger.getLogger(HashTester.class.getName()).log(Level.SEVERE, null, ex);
@@ -141,6 +186,83 @@ public class StreamCipherTester extends TimeTester {
 
             CipherInputStream encryptionStream = new CipherInputStream(input, cipherEncryption);
             CipherInputStream decryptionStream = new CipherInputStream(encryptionStream, cipherDecription);
+
+            meter.start();
+
+            while (decryptionStream.read() > -1);
+
+            decryptionStream.close();//End all encryption and decryption operation
+
+            meter.stop();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            meter = null;
+        }
+
+        return meter;
+    }
+
+    @Override
+    public SimpleMeter testEncryption(File baseInput, String algorithm, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        Cipher cipherEncryption;
+        SimpleMeter meter = new SimpleMeter();
+
+        SecureRandom randGenerator = new SecureRandom();
+        KeyGenerator generator;
+
+        generator = KeyGenerator.getInstance(algorithm.split("/")[0], provider);
+        generator.init(randGenerator);
+        SecretKey key = generator.generateKey();
+
+        cipherEncryption = Cipher.getInstance(algorithm, provider);
+        cipherEncryption.init(Cipher.ENCRYPT_MODE, key);
+
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(baseInput))) {
+
+            CipherInputStream encryptionStream = new CipherInputStream(input, cipherEncryption);
+
+            meter.start();
+
+            while (encryptionStream.read() > -1);
+
+            encryptionStream.close();//End all encryption and decryption operation
+
+            meter.stop();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            meter = null;
+        }
+
+        return meter;
+    }
+
+    @Override
+    public SimpleMeter testDecryption(File baseInput, String algorithm, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        Cipher cipherEncryption;
+        Cipher cipherDecription;
+        SimpleMeter meter = new SimpleMeter();
+
+        SecureRandom randGenerator = new SecureRandom();
+        KeyGenerator generator;
+
+        generator = KeyGenerator.getInstance(algorithm.split("/")[0], provider);
+        generator.init(randGenerator);
+        SecretKey key = generator.generateKey();
+
+        cipherEncryption = Cipher.getInstance(algorithm, provider);
+        cipherEncryption.init(Cipher.ENCRYPT_MODE, key);
+
+        cipherDecription = Cipher.getInstance(algorithm, provider);
+
+        if (cipherEncryption.getIV() != null) {
+            cipherDecription.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(cipherEncryption.getIV()));
+        } else {
+            cipherDecription.init(Cipher.DECRYPT_MODE, key);
+        }
+
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(baseInput))) {
+
+            CipherInputStream decryptionStream = new CipherInputStream(input, cipherDecription);
 
             meter.start();
 

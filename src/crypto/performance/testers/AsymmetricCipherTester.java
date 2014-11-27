@@ -29,9 +29,11 @@ package crypto.performance.testers;
 import crypto.performance.Libraries;
 import crypto.performance.TimeTester;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -54,7 +56,7 @@ import performance.SimpleMeter;
  * @author Victor de Lima Soares
  * @version 1.0
  */
-public class AsymmetricCipherTester extends TimeTester{
+public class AsymmetricCipherTester extends TimeTester {
 
     /**
      * Executes the default test: RSA, ECIES.
@@ -88,17 +90,83 @@ public class AsymmetricCipherTester extends TimeTester{
             providers = new String[]{"BC", "FlexiCore", "SunJCE"};
             asymTester.execTests(nTests, file, out, "RSA/ECB/PKCS1Padding", 2048, providers);
             //RSA - OAEPWithSHA1AndMGF1Padding
-            providers = new String[]{ "BC", "FlexiCore","SunJCE"};
+            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
             asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA1AndMGF1Padding", 2048, providers);
             //RSA - OAEPWithSHA-224AndMGF1Padding
             providers = new String[]{"BC", "FlexiCore", "SunJCE"};
             asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA-224AndMGF1Padding", 2048, providers);
             //RSA - OAEPWithSHA512AndMGF1Padding
-            providers = new String[]{ "BC", "FlexiCore","SunJCE"};
+            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
             asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA-512AndMGF1Padding", 2048, providers);
             //ECIES
             providers = new String[]{"BC", "FlexiEC"};
             asymTester.execTests(nTests, file, out, "ECIES", 256, providers);
+
+        } catch (FileNotFoundException | NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
+            Logger.getLogger(HashTester.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.out.println("Done.");
+    }
+
+    /**
+     * Executes the default test: RSA, ECIES.
+     *
+     * <p>
+     * To encrypt large amounts of data, the ciphers where used as ECB, manually
+     * created. And for diversity, RSA was used with varying padding schemes
+     * applied on each iteration of the ECB mode along with 126 byte buffers.
+     * </p>
+     *
+     * @since 1.0
+     * @param encryptDecrypt If the tests are to be for encryption or
+     * decryption.
+     * <ul>
+     * <li>true: if the test is for encryption;</li>
+     * <li>false: otherwise.</li>
+     * </ul>
+     */
+    public static void run(boolean encryptDecrypt) {
+
+        Libraries.registerProviders();
+
+        File file = new File("data/colors.jpg");
+        File results;
+        if (encryptDecrypt) {
+            results = new File("data/results/asymmetric ciphers encryption.txt");
+        } else {
+            results = new File("data/results/asymmetric ciphers decryption.txt");
+        }
+        int nTests = 5;
+
+        TimeTester asymTester = new AsymmetricCipherTester();
+
+        //Libraries
+        String[] providers;
+
+        if (encryptDecrypt) {
+            System.out.println("Evaluating asymmetric ciphers (encryption):...");
+        } else {
+            System.out.println("Evaluating asymmetric ciphers (decryption):...");
+        }
+
+        try (PrintStream out = new PrintStream(results)) {
+
+            //RSA - PKCS1Padding
+            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
+            asymTester.execTests(nTests, file, out, "RSA/ECB/PKCS1Padding", encryptDecrypt, 2048, providers);
+            //RSA - OAEPWithSHA1AndMGF1Padding
+            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
+            asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA1AndMGF1Padding", encryptDecrypt, 2048, providers);
+            //RSA - OAEPWithSHA-224AndMGF1Padding
+            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
+            asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA-224AndMGF1Padding", encryptDecrypt, 2048, providers);
+            //RSA - OAEPWithSHA512AndMGF1Padding
+            providers = new String[]{"BC", "FlexiCore", "SunJCE"};
+            asymTester.execTests(nTests, file, out, "RSA/ECB/OAEPWithSHA-512AndMGF1Padding", encryptDecrypt, 2048, providers);
+            //ECIES
+            providers = new String[]{"BC", "FlexiEC"};
+            asymTester.execTests(nTests, file, out, "ECIES", encryptDecrypt, 256, providers);
 
         } catch (FileNotFoundException | NoSuchAlgorithmException | NoSuchProviderException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
             Logger.getLogger(HashTester.class.getName()).log(Level.SEVERE, null, ex);
@@ -116,7 +184,11 @@ public class AsymmetricCipherTester extends TimeTester{
      * @param provider Library from where the algorithm comes.
      * @return A SimpleMeter containing the time measurements.
      *
-     * @throws UnsupportedOperationException
+     * @throws java.security.NoSuchProviderException
+     * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
      */
     @Override
     public SimpleMeter test(File baseInput, String algorithm, String provider)
@@ -137,6 +209,9 @@ public class AsymmetricCipherTester extends TimeTester{
      *
      * @throws java.security.NoSuchProviderException
      * @throws java.security.NoSuchAlgorithmException
+     * @throws javax.crypto.NoSuchPaddingException
+     * @throws java.security.InvalidAlgorithmParameterException
+     * @throws java.security.InvalidKeyException
      */
     @Override
     public SimpleMeter test(File baseInput, String algorithm, int keySize, String provider)
@@ -188,5 +263,123 @@ public class AsymmetricCipherTester extends TimeTester{
         }
 
         return meter;
+    }
+
+    @Override
+    public SimpleMeter testEncryption(File baseInput, String algorithm, int keySize, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        Cipher cipherEncryption;
+
+        SimpleMeter meter = new SimpleMeter();
+
+        SecureRandom randGenerator = new SecureRandom();
+        KeyPairGenerator generator;
+
+        if (provider.equals("SunJCE") && algorithm.split("/")[0].equals("RSA")) {
+            generator = KeyPairGenerator.getInstance(algorithm.split("/")[0], "SunRsaSign");
+        } else {
+            generator = KeyPairGenerator.getInstance(algorithm.split("/")[0], provider);
+        }
+
+        generator.initialize(keySize, randGenerator);
+        KeyPair key = generator.generateKeyPair();
+        PublicKey pubKey = key.getPublic();
+
+        cipherEncryption = Cipher.getInstance(algorithm, provider);
+        cipherEncryption.init(Cipher.ENCRYPT_MODE, pubKey);
+
+        byte inputBuffer[] = new byte[126];
+
+        int lenght;
+
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(baseInput))) {
+
+            meter.start();
+
+            while ((lenght = input.read(inputBuffer)) > -1) {
+                cipherEncryption.doFinal(inputBuffer, 0, lenght);
+            }
+
+            meter.stop();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            meter = null;
+        }
+
+        return meter;
+    }
+
+    @Override
+    public SimpleMeter testDecryption(File baseInput, String algorithm, int keySize, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        Cipher cipherEncryption;
+        Cipher cipherDecription;
+        SimpleMeter meter = new SimpleMeter();
+
+        SecureRandom randGenerator = new SecureRandom();
+        KeyPairGenerator generator;
+
+        if (provider.equals("SunJCE") && algorithm.split("/")[0].equals("RSA")) {
+            generator = KeyPairGenerator.getInstance(algorithm.split("/")[0], "SunRsaSign");
+        } else {
+            generator = KeyPairGenerator.getInstance(algorithm.split("/")[0], provider);
+        }
+
+        generator.initialize(keySize, randGenerator);
+        KeyPair key = generator.generateKeyPair();
+        PrivateKey privKey = key.getPrivate();
+        PublicKey pubKey = key.getPublic();
+
+        cipherEncryption = Cipher.getInstance(algorithm, provider);
+        cipherEncryption.init(Cipher.ENCRYPT_MODE, pubKey);
+
+        cipherDecription = Cipher.getInstance(algorithm, provider);
+        cipherDecription.init(Cipher.DECRYPT_MODE, privKey);
+
+        byte inputBuffer[] = new byte[126];
+        byte outputBuffer[] = null;
+        int lenght;
+
+        File tmp = new File("tmp");
+        
+        //Creates tmp file with encrypted data.
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(baseInput));
+                BufferedOutputStream tmpFile = new BufferedOutputStream(new FileOutputStream(tmp));) {
+
+            while ((lenght = input.read(inputBuffer)) > -1) {
+                outputBuffer = cipherEncryption.doFinal(inputBuffer, 0, lenght);
+                tmpFile.write(outputBuffer);
+            }
+
+            inputBuffer = new byte[outputBuffer.length];
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        //Decription operations
+        try (BufferedInputStream input = new BufferedInputStream(new FileInputStream(tmp))) {
+
+            meter.start();
+
+            while ((lenght = input.read(inputBuffer)) > -1) {
+                cipherDecription.doFinal(inputBuffer, 0, lenght);
+            }
+
+            meter.stop();
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            meter = null;
+        }
+        tmp.delete();
+        return meter;
+    }
+
+    @Override
+    public SimpleMeter testEncryption(File baseInput, String algorithm, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        throw new UnsupportedOperationException("For asymmetric ciphers a key size needs to be defined.");
+    }
+
+    @Override
+    public SimpleMeter testDecryption(File baseInput, String algorithm, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
+        throw new UnsupportedOperationException("For asymmetric ciphers a key size needs to be defined.");
     }
 }
