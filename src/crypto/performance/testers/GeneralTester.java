@@ -62,17 +62,17 @@ public class GeneralTester {
         //Encryption and decription performance test.
         BlockCipherTester.run();
         HashTester.run();
-        AsymmetricCipherTester.run();
+        AsymmetricCipherTester.run();//Seriously time consuming
         StreamCipherTester.run();
 
         //Encryption only performance test.
         BlockCipherTester.run(true);
-        AsymmetricCipherTester.run(true);
+        AsymmetricCipherTester.run(true);//Time consuming 
         StreamCipherTester.run(true);
 
         //Decription only performance test.
         BlockCipherTester.run(false);
-        AsymmetricCipherTester.run(false);
+        AsymmetricCipherTester.run(false);//Seriously time consuming 
         StreamCipherTester.run(false);
     }
 

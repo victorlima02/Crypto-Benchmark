@@ -308,6 +308,21 @@ public class AsymmetricCipherTester extends TimeTester {
         return meter;
     }
 
+    /**
+     * Instable.
+     * Works fine for RSA, but needs adjustments for EC.
+     * @param baseInput
+     * @param algorithm
+     * @param keySize
+     * @param provider
+     * @return
+     * @throws NoSuchProviderException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchPaddingException
+     * @throws InvalidKeyException
+     * @throws InvalidAlgorithmParameterException 
+     */
+    @Deprecated
     @Override
     public SimpleMeter testDecryption(File baseInput, String algorithm, int keySize, String provider) throws NoSuchProviderException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException {
         Cipher cipherEncryption;
